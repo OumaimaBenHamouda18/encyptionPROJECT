@@ -7,6 +7,7 @@ package encyptiondecryptionproject;
 import javax.crypto.SecretKey;
 import javax.crypto.KeyGenerator;
 import javax.crypto.Cipher;
+import java.sql.SQLOutput;
 import java.util.Base64;
 
 /**
@@ -64,15 +65,13 @@ public class AES {
     
     
       public static String decrypt(String encyptedMessage,SecretKey secKey) throws Exception{
-       
        Cipher decryptionCipher=Cipher.getInstance("AES");
 
 
 
        decryptionCipher.init(Cipher.DECRYPT_MODE,secKey);
-
        byte[] decryptedBytes= decryptionCipher.doFinal(hexToByte(encyptedMessage));
-       return new String(decryptedBytes); 
+          return new String(decryptedBytes);
 
     }
     
