@@ -19,7 +19,7 @@ public class menu {
 
             switch (opcion) {
                 case 1:
-                    readPath();
+                    readPath("files_decrypt\\", true);
                     break;
                 case 2:
                     //decrypt_menu();
@@ -68,7 +68,6 @@ public class menu {
                 System.out.println("Error");
             }
         }
-    }
 }
 
 
