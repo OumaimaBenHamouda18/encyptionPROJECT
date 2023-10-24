@@ -4,9 +4,14 @@
  */
 package encyptiondecryptionproject;
 import java.io .*;
+import java.nio.Buffer;
 import java.util.Scanner;
 import encyptiondecryptionproject.AES;
+
+import javax.annotation.processing.Filer;
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 /**
  *
  * @author Oumaima
@@ -55,6 +60,33 @@ public static String getTextToEncrypt(String path){
     /**
      * @param args the command line arguments
      */
+    public static void fileW_R(boolean escribir, String texto, String FileName, String SecretKey) throws IOException {
+        if (escribir) {
+            BufferedWriter bw = new BufferedWriter(new FileWriter("encyptionPROJECT\\files_decrypt\\"+FileName));
+            bw.write(texto);
+            bw.close();
+            System.out.println("Encriptado exitoso");
+        } else {
+            // agregar menu para buscar archivo de la key y usarla, y funcion check
+            BufferedReader bw = new BufferedReader(new FileReader("encyptionPROJECT\\files_encrypt\\" + FileName));
+
+        }
+    }
+    public static void Encrypt(String File, String newFile) {
+        String textToEncrypt = getTextToEncrypt("encyptionPROJECT\\files_encrypt\\" + File);
+        System.out.println("El texto que se va a encriptar es:\n" + textToEncrypt);
+        try {
+            SecretKey secKey = AES.initializeKey();
+            String encryptedText= AES.bytesToHex(AES.encrypt(textToEncrypt, secKey));
+            System.out.println("Encrypted Text: "+ encryptedText);
+            BufferedWriter bw = new BufferedWriter(new FileWriter("encyptionPROJECT\\keys\\key_"+newFile));
+            byte[] keyBytes = secKey.getEncoded();
+            String keyString = Base64.getEncoder().encodeToString(keyBytes);
+            bw.write(keyString);
+            bw.close();
+            fileW_R(true, encryptedText, newFile);
+        } catch(Exception ignored){}
+    }
     public static void main(String[] args) {
         String path="test.txt";
         String textToEncrypt=getTextToEncrypt(path);
