@@ -84,7 +84,7 @@ public static String getTextToEncrypt(String path){
             String keyString = Base64.getEncoder().encodeToString(keyBytes);
             bw.write(keyString);
             bw.close();
-            fileW_R(true, encryptedText, newFile);
+            fileW_R(true, encryptedText, newFile, null);
         } catch(Exception ignored){}
     }
     public static void main(String[] args) {

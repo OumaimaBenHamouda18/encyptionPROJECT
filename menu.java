@@ -34,7 +34,7 @@ public class menu {
     }
 
     public static void encrypt_menu() {
-        String File = readPath("encyptionPROJECT\\files_decrypt", true);
+        String File = readPath("encyptionPROJECT\\files_encrypt", true);
         Scanner sc = new Scanner(System.in);
         System.out.println("Nombre del archivo nuevo encriptado :");
         String newFile = sc.next();
@@ -46,13 +46,13 @@ public class menu {
         }
     }
     public static void decrypt_menu() throws Exception {
-        String File = readPath("encyptionPROJECT\\files_encrypt", false);
+        String File = readPath("encyptionPROJECT\\files_decrypt", false);
         Scanner sc = new Scanner(System.in);
     }
     public static boolean checkFile(String file, boolean encriptar){
-        String path = "encyptionPROJECT\\files_decrypt";
+        String path = "encyptionPROJECT\\files_encrypt";
         if (encriptar) {
-            path = "encyptionPROJECT\\files_encrypt";
+            path = "encyptionPROJECT\\files_decrypt";
         }
 
         File dir = new File(path);
