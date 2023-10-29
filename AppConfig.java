@@ -28,5 +28,10 @@ class AppConfig{
         return enVars.getProperty("DECRYPTION_FOLDER");
     }
 
+    public static String getSecretKeysDirectory(){
+        return enVars.getProperty("SECRET_KEYS_FOLDER");
+    }
+
+
 
 }

@@ -7,6 +7,7 @@ package encyptiondecryptionproject;
 import javax.crypto.SecretKey;
 import javax.crypto.KeyGenerator;
 import javax.crypto.Cipher;
+import javax.management.openmbean.InvalidKeyException;
 import java.sql.SQLOutput;
 import java.util.Base64;
 
@@ -59,7 +60,7 @@ public class AES {
 
        //hace la encripcion o la decripcion , genera un array de bytes
        byte[] encryptedBytes= encryptionCipher.doFinal(message.getBytes());
-       return encryptedBytes; 
+       return encryptedBytes;
 
     }
     
@@ -68,9 +69,10 @@ public class AES {
        Cipher decryptionCipher=Cipher.getInstance("AES");
 
 
-
        decryptionCipher.init(Cipher.DECRYPT_MODE,secKey);
-       byte[] decryptedBytes= decryptionCipher.doFinal(hexToByte(encyptedMessage));
+
+          byte[] decryptedBytes= decryptionCipher.doFinal(hexToByte(encyptedMessage));
+
           return new String(decryptedBytes);
 
     }
@@ -124,6 +126,11 @@ public class AES {
         System.out.println("Original Text:" + plainText);
         SecretKey secKey = initializeKey();
         System.out.println("AES Key (Hex Form):"+bytesToHex(secKey.getEncoded()));
+
+            byte[] keyBytes = secKey.getEncoded();
+            String keyString = Base64.getEncoder().encodeToString(keyBytes);
+
+
         String encryptedText = bytesToHex(encrypt(plainText, secKey));
         System.out.println("Encrypted Text (Hex Form):"+encryptedText);
         String decryptedText = decrypt(encryptedText, secKey);
