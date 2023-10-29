@@ -2,10 +2,25 @@ package encyptiondecryptionproject;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.Properties;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import java.util.Scanner;
 
 public class menu {
+
+
+    static String decryption_directory= AppConfig.getDecryptionDirectory();
+    static String encryption_directory= AppConfig.getEncryptionDirectory();
+
     public static void main(String[] args) throws Exception {
+
+
+
+
+
+
         Scanner sc = new Scanner(System.in);
 
         while (true) {
@@ -34,25 +49,40 @@ public class menu {
     }
 
     public static void encrypt_menu() {
-        String File = readPath("encyptionPROJECT\\files_encrypt", true);
+        //ACCESS ENV VIRABLES
+        String File = readPath(encryption_directory, true);
         Scanner sc = new Scanner(System.in);
-        System.out.println("Nombre del archivo nuevo encriptado :");
-        String newFile = sc.next();
-        if ( !newFile.contains(".txt")){
-            newFile = newFile + ".txt";
-        }
-        if (checkFile(newFile, true)){
-            EncyptionDecryptionProject.Encrypt(File, newFile);
-        }
+        String newFile;
+
+        System.out.println("New encypted file name: ");
+
+        do {
+
+            newFile = sc.next();
+            if ( !newFile.contains(".txt")){
+                newFile = newFile + ".txt";
+                 }
+            if (!checkFile(newFile, true)){
+                System.out.println("This file name already exists please type another filename: ");
+            }
+        }while(!checkFile(newFile, true));
+        EncyptionDecryptionProject.Encrypt(File, newFile);
     }
+
     public static void decrypt_menu() throws Exception {
-        String File = readPath("encyptionPROJECT\\files_decrypt", false);
+
+        String File = readPath(decryption_directory, false);
         Scanner sc = new Scanner(System.in);
     }
+
+
     public static boolean checkFile(String file, boolean encriptar){
-        String path = "encyptionPROJECT\\files_encrypt";
+
+
+
+        String path = encryption_directory;
         if (encriptar) {
-            path = "encyptionPROJECT\\files_decrypt";
+            path = encryption_directory;
         }
 
         File dir = new File(path);
@@ -61,7 +91,6 @@ public class menu {
             if (fileNames != null && fileNames.length > 0) {
                 for (String fileName : fileNames) {
                     if (Objects.equals(fileName, file)) {
-                        System.out.println("Ya exsiste este nombre");
                         return false;
                     }
                 }
@@ -69,26 +98,38 @@ public class menu {
         }
         return true;
     }
-    public static String readPath(String path, boolean encriptar) {
+    public static String readPath(String path, boolean encriptar) throws IndexOutOfBoundsException {
+        System.out.println("path: "+path);
         File dir = new File(path);
         Scanner sc = new Scanner(System.in);
         String txt = "desencriptar";
         if (encriptar) {    txt = "encriptar";  }
-
             if (dir.exists() && dir.isDirectory()) {
 
                 String[] fileNames = dir.list();
 
                 if (fileNames != null && fileNames.length > 0) {
-                    System.out.println("Elige el fichero que deseas " + txt + ": ");
+
                     int i = 0;
                     for (String fileName : fileNames) {
-                        System.out.println(i + " : " + fileName);
+                        System.out.println((i+1) + " : " + fileName);
                         i++;
                     }
-                    int opcion = sc.nextInt();
-                    System.out.println(fileNames[opcion]);
-                    return fileNames[opcion];
+                    int opcion;
+
+                    do{
+                        System.out.println("Elige el fichero que deseas " + txt + ": ");
+                        opcion = sc.nextInt();
+                        try{
+                            System.out.println(fileNames[opcion-1]);
+                        }catch(IndexOutOfBoundsException e){
+                            System.out.println("Incorrect Option!");
+                        }
+
+
+                    }while((opcion-1)>= fileNames.length);
+
+                    return fileNames[opcion-1];
                 } else {
                     System.out.println("No exsisten archivos en este directorio");
                 }
@@ -98,5 +139,4 @@ public class menu {
         return null;
     }
 }
-
 
