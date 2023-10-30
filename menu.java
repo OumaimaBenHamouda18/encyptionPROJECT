@@ -38,7 +38,7 @@ public class menu {
 
             switch (opcion) {
                 case 1:
-                    encrypt_menu();
+                    //encrypt_menu();
                     break;
                 case 2:
                     decrypt_menu();
@@ -52,7 +52,7 @@ public class menu {
         }
     }
 
-    public static void encrypt_menu() {
+    /*public static void encrypt_menu() {
         String File = readPath(encryption_directory);
         Scanner sc = new Scanner(System.in);
         String newFile;
@@ -71,7 +71,7 @@ public class menu {
         }while(!checkFile(newFile, true));
         EncyptionDecryptionProject.Encrypt(File, decryption_directory+"\\"+newFile);
     }
-
+*/
 
 
     public static void decrypt_menu() throws Exception {
@@ -81,7 +81,7 @@ public class menu {
 
         System.out.println("Choose the file you want to decrypt: ");
         File folderRef= new File(decryption_directory);
-        String fileName=readPath(folderRef);
+        String fileName=choose_file_option(folderRef);
         //leer and store the text to decrypt
         String decrptedtextfromfile=EncyptionDecryptionProject.getText(decryption_directory+"\\"+fileName);
 
@@ -147,7 +147,7 @@ public class menu {
     //*****************************cambiar to   choose_file_option*******************//
 
 
-    public static String readPath(File dir)
+    public static String choose_file_option(File dir)
 
     {   Scanner sc=new Scanner(System.in);
         String [] fileNames=null;
@@ -162,7 +162,7 @@ public class menu {
                     System.out.println(i+"-"+file);
                     i++;
                 }
-
+//se puede hacer una funcion choose option
                 do{
                     System.out.println("Choose the file you want to decrypt: ");
                     option= sc.nextInt()-1;
