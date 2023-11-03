@@ -7,6 +7,7 @@ package encyptiondecryptionproject;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import java.util.Arrays;
 import java.util.Base64;
 
 public class AES implements Interface_Proyecto {
@@ -38,8 +39,7 @@ public class AES implements Interface_Proyecto {
         encryptionCipher.init(Cipher.ENCRYPT_MODE, secKey);
 
         //hace la encripcion o la decripcion , genera un array de bytes
-        byte[] encryptedBytes = encryptionCipher.doFinal(message.getBytes());
-        return encryptedBytes;
+        return encryptionCipher.doFinal(message.getBytes());
     }
 
     public static String decrypt(String encyptedMessage, SecretKey secKey) throws Exception {
@@ -71,14 +71,15 @@ public class AES implements Interface_Proyecto {
     }
 
     public static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
         for (byte b : hash) {
             String hex = Integer.toHexString(0xFF & b);
             if (hex.length() == 1) {
-                new StringBuilder(2 * hash.length).append('0');
+                hexString.append('0');  // Añade un 0 a la izquierda si el valor es de un solo dígito en hexadecimal.
             }
-            new StringBuilder(2 * hash.length).append(hex);
+            hexString.append(hex);  // Agrega el dígito hexadecimal al resultado.
         }
-        return "";
+        return hexString.toString();  // Devuelve la representación hexadecimal como una cadena.
     }
 
 

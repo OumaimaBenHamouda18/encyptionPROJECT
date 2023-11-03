@@ -48,12 +48,10 @@ public class EncyptionDecryption {
 
 
     public static void store_in_file(String textToStore, String path) throws IOException {
-
         BufferedWriter bw = new BufferedWriter(new FileWriter(path));
         bw.write(textToStore);
         bw.close();
-        System.out.println("Encriptado exitoso");
-
+        System.out.println("Succes, saving inf " + path);
     }
 
 
