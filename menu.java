@@ -35,6 +35,7 @@ public class menu {
                     break;
                 case 2:
                     decrypt_menu();
+                    break;
                 case 3:
                     System.out.println("¡Goodbye!");
                     sc.close();
@@ -50,31 +51,39 @@ public class menu {
         Scanner sc = new Scanner(System.in);
         String newFile;
 
+
+        // Pide el nombre del archivo
         System.out.println("New encrypted file name: ");
 
         do {
-
+            // Scanner , para el nombre del nuevo archivo, si este no tiene el .txt, se le agrega.
             newFile = sc.next();
             if (!newFile.contains(".txt")) {
                 newFile = newFile + ".txt";
             }
+
+            // si ya existe un archivo con ese nombre vuelve al loop del while.
             if (!checkFile(newFile, true)) {
                 System.out.println("This file name already exists please type another filename: ");
             }
         } while (!checkFile(newFile, true));
 
         try {
-            // generates the key and encrypts the text with that
+            // Genera la key
             SecretKey secKey = AES.initializeKey();
+            // Obtiene el texto que se va a encriptar
             String textToEncrypt = EncyptionDecryption.getTextFromFile(encryption_directory + "\\" + File);
+            // Se encrypta lo devuelve en bytes y lo pasamos a Hex para guardarlo.
             byte[] test = AES.encrypt(textToEncrypt, secKey);
             String encryptedText = AES.bytesToHex(test);
-
+            //Se guarda en forma de string
             EncyptionDecryption.store_in_file(encryptedText, decryption_directory + "\\" + newFile);
-            // guarda key
+            // Encode de la key, se pasa a string y se guarda en un archivo
             byte[] keyBytes = secKey.getEncoded();
             String keyString = Base64.getEncoder().encodeToString(keyBytes);
             EncyptionDecryption.store_in_file(keyString, secretKeys_directory + "\\key_" + newFile);
+
+            // Se guardan 2 archivos separados la key y el archivo encriptado.
         } catch (Exception e) {
             throw new RuntimeException(e);
 
@@ -114,7 +123,8 @@ public class menu {
 
 
     public static boolean checkFile(String file, boolean encriptar) {
-
+        // Revisa si ya existe un archivo con el mismo nombre en el mismo directorio, en el caso de que si devuelve un true, la booleana
+        // sirve para que se pueda usar en ambos directorios.
         String path = encryption_directory;
         if (encriptar) {
             path = decryption_directory;
@@ -142,12 +152,20 @@ public class menu {
         File folderRef = new File(dirPath);
         String[] fileNames = null;
         String file = "";
-        if (folderRef.exists() && folderRef.isDirectory()) {
-            fileNames = folderRef.list();
-            if (fileNames.length == 0) System.out.println("There's no files to decrypt. \nFolder empty.");
 
+        // Verificar si el directorio existe y es un directorio válido
+        if (folderRef.exists() && folderRef.isDirectory()) {
+            // Obtener los nombres de archivos y directorios en el directorio
+            fileNames = folderRef.list();
+
+            // Si no hay archivos en el directorio, mostrar un mensaje
+            if (fileNames.length == 0) System.out.println("There's no files here. \nEmpty directory.");
+
+            // Si hay archivos en el directorio
             if (fileNames != null && fileNames.length > 0) {
+                // Mostrar los archivos en el directorio
                 show_files(folderRef);
+                // Permitir al usuario elegir un archivo con un escáner, basado en el tipo de archivo
                 file = user_choose_file_with_scanner(fileNames, fileType);
             } else {
                 System.out.println("There's no files in this directory");
@@ -155,28 +173,31 @@ public class menu {
         } else {
             System.out.println("This directory doesn't exist");
         }
+
         return file;
     }
+
 
 
     public static String user_choose_file_with_scanner(String[] fileNames, String fileType) {
         int option;
         do {
+            // Solicitar al usuario que ingrese la opción del archivo que desea
             option = sc.nextInt() - 1;
             try {
+                // Verificar si la opción está fuera de los límites de la matriz de nombres de archivos
                 if (option >= fileNames.length || option < 0) {
                     System.out.println("Incorrect Option!");
                     System.out.print("Choose the file you want to " + fileType + " : ");
                 }
-
             } catch (IndexOutOfBoundsException e) {
             }
-
-
         } while (option >= fileNames.length || option < 0);
-        return fileNames[option];
 
+        // Devolver el nombre del archivo seleccionado por el usuario
+        return fileNames[option];
     }
+
 
     public static void show_files(File folderRef) {
 

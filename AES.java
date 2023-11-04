@@ -43,25 +43,32 @@ public class AES implements Interface_Proyecto {
     }
 
     public static String decrypt(String encyptedMessage, SecretKey secKey) throws Exception {
+        // Crea una instancia de Cipher para el algoritmo AES
         Cipher decryptionCipher = Cipher.getInstance("AES");
 
+        // Inicializa el Cipher en modo descifrado con la clave secreta especificada
         decryptionCipher.init(Cipher.DECRYPT_MODE, secKey);
 
+        // Descifra el mensaje cifrado y convierte los bytes descifrados en una cadena
         byte[] decryptedBytes = decryptionCipher.doFinal(hexToByte(encyptedMessage));
-
         return new String(decryptedBytes);
     }
 
+
     public static byte[] encode(byte[] data) {
+        // Devuelve la codificación Base64 de los datos de entrada
         return Base64.getEncoder().encode(data);
     }
 
+
     public static byte[] hexToByte(String txt) {
+        // Check if the hex string has an even number of characters
         int length = txt.length();
         if (length % 2 != 0) {
             throw new IllegalArgumentException("Hex string must have an even number of characters");
         }
 
+        // Convert the hex string to a byte array
         byte[] result = new byte[length / 2];
         for (int i = 0; i < length; i += 2) {
             result[i / 2] = (byte) ((Character.digit(txt.charAt(i), 16) << 4) + Character.digit(txt.charAt(i + 1), 16));
@@ -69,6 +76,7 @@ public class AES implements Interface_Proyecto {
 
         return result;
     }
+
 
     public static String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder(2 * hash.length);
