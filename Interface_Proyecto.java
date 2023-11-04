@@ -55,9 +55,7 @@ public interface Interface_Proyecto{
 
     //******************************************EncryptionDecryption******************************************//
 
-    static void decrypt_menu() throws Exception{
-
-    }
+    void encrypt_menu();
 
     static String choose_file_from_dir(String dirPath,String fileType){
         return "";

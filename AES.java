@@ -10,7 +10,7 @@ import javax.crypto.SecretKey;
 import java.util.Arrays;
 import java.util.Base64;
 
-public class AES implements Interface_Proyecto {
+public class AES {
     //definir la talla del secret key
     private static final int KEY_SIZE = 128;
 

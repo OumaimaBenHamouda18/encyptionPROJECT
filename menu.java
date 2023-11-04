@@ -31,7 +31,8 @@ public class menu {
 
             switch (opcion) {
                 case 1:
-                    encrypt_menu();
+                    Functions F = new Functions();
+                    F.encrypt_menu(); // Llama al método encrypt_menu
                     break;
                 case 2:
                     decrypt_menu();
@@ -43,50 +44,6 @@ public class menu {
                 default:
                     System.out.println("Not valid option. Try again.");
             }
-        }
-    }
-
-    public static void encrypt_menu() {
-        String File = choose_file_from_dir(encryption_directory, "encrypt");
-        Scanner sc = new Scanner(System.in);
-        String newFile;
-
-
-        // Pide el nombre del archivo
-        System.out.println("New encrypted file name: ");
-
-        do {
-            // Scanner , para el nombre del nuevo archivo, si este no tiene el .txt, se le agrega.
-            newFile = sc.next();
-            if (!newFile.contains(".txt")) {
-                newFile = newFile + ".txt";
-            }
-
-            // si ya existe un archivo con ese nombre vuelve al loop del while.
-            if (!checkFile(newFile, true)) {
-                System.out.println("This file name already exists please type another filename: ");
-            }
-        } while (!checkFile(newFile, true));
-
-        try {
-            // Genera la key
-            SecretKey secKey = AES.initializeKey();
-            // Obtiene el texto que se va a encriptar
-            String textToEncrypt = EncyptionDecryption.getTextFromFile(encryption_directory + "\\" + File);
-            // Se encrypta lo devuelve en bytes y lo pasamos a Hex para guardarlo.
-            byte[] test = AES.encrypt(textToEncrypt, secKey);
-            String encryptedText = AES.bytesToHex(test);
-            //Se guarda en forma de string
-            EncyptionDecryption.store_in_file(encryptedText, decryption_directory + "\\" + newFile);
-            // Encode de la key, se pasa a string y se guarda en un archivo
-            byte[] keyBytes = secKey.getEncoded();
-            String keyString = Base64.getEncoder().encodeToString(keyBytes);
-            EncyptionDecryption.store_in_file(keyString, secretKeys_directory + "\\key_" + newFile);
-
-            // Se guardan 2 archivos separados la key y el archivo encriptado.
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-
         }
     }
 
@@ -212,3 +169,6 @@ public class menu {
 
 
 }
+
+
+
