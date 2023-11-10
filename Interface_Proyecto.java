@@ -23,7 +23,9 @@ public interface Interface_Proyecto{
     //=============================================================================================================\\
 
     Scanner openFile(String path) throws Exception;
-    String getTextFromFile(String path) throws Exception;
+
+    String getTextFromFile(String path, boolean encriptar) throws Exception;
+
     void store_in_file(String textToStore, String path) throws IOException;
     SecretKey recuperar_secret_key(String keyString) throws Exception;
 
@@ -49,6 +51,10 @@ public interface Interface_Proyecto{
 
     void show_files(File folderRef);
     String user_choose_file_with_scanner(String[] fileNames, String fileType);
+    void menu_PDF();
+    void storePDF(String file, String dir);
+
+    String Colores(String color);
 
     //=============================================================================================================\\
     //                                                  UNSAFE                                                     \\

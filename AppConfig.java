@@ -41,4 +41,8 @@ class AppConfig {
         // Obtener la ruta del directorio de claves secretas desde las variables de entorno
         return enVars.getProperty("SECRET_KEYS_FOLDER");
     }
+    public static String getPDFDirectory() {
+        // Obtener la ruta del directorio de claves secretas desde las variables de entorno
+        return enVars.getProperty("PDF_FOLDER");
+    }
 }
