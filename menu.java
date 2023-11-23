@@ -10,12 +10,13 @@ public class menu {
         Functions F = new Functions(); // Carga funciones de la clase EncryptionDecryption
 
         while (true) {
-            System.out.println(F.Colores("white") + "Option menu:" + F.Colores(null));
-            System.out.println(F.Colores("blue") + "1. File Encrypt");
-            System.out.println(F.Colores("blue") + "2. File Decrypt");
-            System.out.println(F.Colores("red") + "3. Leave");
-            System.out.print(F.Colores("white") + "Select an option: " + F.Colores(null));
-
+            F.Texto("yellow", "══════════════════════════════", true);
+            F.Texto("yellow", "         Option Menu          ", true);
+            F.Texto("yellow", "══════════════════════════════", true);
+            F.Texto("yellow", "║ 1. File Encrypt              ", true);
+            F.Texto("yellow", "║ 2. File Decrypt              ", true);
+            F.Texto("yellow", "║ 3. Leave                     ", true);
+            F.Texto("yellow", "║ Option : ", false);
 
             int opcion = F.numero();
             switch (opcion) {
@@ -27,12 +28,13 @@ public class menu {
                     F.decrypt_menu(); // Llama al método decrypt_menu
                     break;
                 case 3:
-                    System.out.println(F.Colores("cyan") + "¡Goodbye!");
+                    F.Texto("yellow", "║ ", false);
+                    F.Texto("cyan", Functions.ANSI_BOLD+"¡Goodbye!", true);
                     sc.close();
                     return;
                 default:
-                System.out.println(F.Colores("red") + "Not valid option. Try again." + F.Colores(null));
-
+                    F.Texto("yellow", "║ ", false);
+                    F.Texto("red", Functions.ANSI_BOLD +"¡Not valid option. Try again.!", true);
             }
         }
     }

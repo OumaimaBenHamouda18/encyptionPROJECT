@@ -44,7 +44,7 @@ public interface Interface_Proyecto{
     void menu_PDF();
     void storePDF(String file, String dir);
     String Colores(String color);
-
+    void Texto(String color, String Texto, boolean saltoLinea);
     int numero();
 
     //=============================================================================================================\\
