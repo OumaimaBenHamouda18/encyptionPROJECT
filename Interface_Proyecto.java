@@ -23,9 +23,7 @@ public interface Interface_Proyecto{
     //=============================================================================================================\\
 
     Scanner openFile(String path) throws Exception;
-
     String getTextFromFile(String path, boolean encriptar) throws Exception;
-
     void store_in_file(String textToStore, String path) throws IOException;
     SecretKey recuperar_secret_key(String keyString) throws Exception;
 
@@ -34,33 +32,25 @@ public interface Interface_Proyecto{
     //=============================================================================================================\\
 
     void encrypt_menu() throws Exception;
-
     String encrypt_without_secretkey(String encrypetText);
-
     String encrypt_with_secret_key(String encryptedText, String newFile) throws Exception;
-
     void decrypt_menu() throws Exception;
-
     String decrypt_without_secret_key(String encryptedText) throws Exception;
-
     String decrypt_with_secret_key(String encryptedText) throws Exception;
-
     boolean checkFile(String file, boolean encriptar);
-
     String choose_file_from_dir(String dirPath, String fileType);
-
     void show_files(File folderRef);
     String user_choose_file_with_scanner(String[] fileNames, String fileType);
     void menu_PDF();
     void storePDF(String file, String dir);
-
     String Colores(String color);
+
+    int numero();
 
     //=============================================================================================================\\
     //                                                  UNSAFE                                                     \\
     //=============================================================================================================\\
 
     String Unsafe_encrypt(String textToEncrypt);
-
     String Unsafe_decrypt(String encryptedText) throws Exception;
 }

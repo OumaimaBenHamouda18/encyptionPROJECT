@@ -43,10 +43,17 @@ public class Functions implements Interface_Proyecto {
 
     @Override
     public void encrypt_menu() throws Exception {
-        String File = choose_file_from_dir(encryption_directory, "encrypt");
+
         String newFile;
         String encrypt = "";
-
+        String File;
+        String textToEncrypt = "";
+        do {
+            File = choose_file_from_dir(encryption_directory, "encrypt");
+            textToEncrypt = getTextFromFile(encryption_directory + "\\" + File, true);
+            if ( textToEncrypt==null)
+                System.out.println(ANSI_RED+"Error, empty file, select another."+ ANSI_RESET);;
+        } while(textToEncrypt==null);
 
         // Pide el nombre del archivo
         System.out.println(ANSI_CYAN + "New encrypted file name: " + ANSI_RESET);
@@ -64,19 +71,31 @@ public class Functions implements Interface_Proyecto {
             }
         } while (!checkFile(newFile, true));
 
-        String textToEncrypt = getTextFromFile(encryption_directory + "\\" + File, true);
-
         System.out.println(ANSI_GREEN + "Would you like to create and use a secret key?\n1-Yes\n2-No" + ANSI_RESET);
-        switch (sc.nextInt()) {
+        int option;
+        do {
+            option = numero();
+            if (option != 1 && option != 2)
+                System.out.println(Colores("red") + "Not valid option. Try again." + Colores(null));
+        } while (option != 1 && option != 2);
+        switch (option) {
             case 1:
                 encrypt = encrypt_with_secret_key(textToEncrypt, newFile);
                 break;
             case 2:
                 encrypt = encrypt_without_secretkey(textToEncrypt);
                 break;
+            default:
+                System.out.println(Colores("red") + "Not valid option. Try again." + Colores(null));
         }
         store_in_file(encrypt, decryption_directory + "\\" + newFile);
-
+        System.out.println("Would you like to store this in PDF? Y/N");
+        String respuesta = sc.next();
+        sc.nextLine();
+        if (respuesta.equalsIgnoreCase("Y")) {
+            newFile = newFile.replace(".txt", "");
+            storePDF(newFile, decryption_directory + "\\" + newFile + ".txt");
+        }
     }
 
     @Override
@@ -102,11 +121,28 @@ public class Functions implements Interface_Proyecto {
     public void decrypt_menu() throws Exception {
         System.out.println("Choose the file you to decrypt:");
         String decryptado = "";
-        String fileName = choose_file_from_dir(decryption_directory, "decrypt");
+        String fileName = "";
+        String decrptedtextfromfile="";
+        do {
+            fileName = choose_file_from_dir(decryption_directory, "decrypt");
+            decrptedtextfromfile = getTextFromFile(decryption_directory + "\\" + fileName, false);
+            if ( decrptedtextfromfile==null)
+                System.out.println(ANSI_RED+"Error, empty file, select another."+ ANSI_RESET);;
+        } while(decrptedtextfromfile==null);
         //leer and store the text to decrypt
-        String decrptedtextfromfile = getTextFromFile(decryption_directory + "\\" + fileName, false);
+
         System.out.println("Do you have a secret key?\n1-Yes\n2-No");
-        switch (sc.nextInt()) {
+        int option;
+        do {
+            option = numero();
+
+            if (option != 1 && option != 2)
+                System.out.println(Colores("red") + "Not valid option. Try again." + Colores(null));
+
+
+        } while (option != 1 && option != 2);
+
+        switch (option) {
             case 1:
                 decryptado = decrypt_with_secret_key(decrptedtextfromfile);
                 break;
@@ -123,6 +159,13 @@ public class Functions implements Interface_Proyecto {
 
         //store decrypted text with the name specified
         store_in_file(decryptado, encryption_directory + "\\" + newFileDecryptedName);
+        System.out.println("Would you like to store this in PDF? Y/N");
+        String respuesta = sc.next();
+        sc.nextLine();
+        if (respuesta.equalsIgnoreCase("Y")) {
+            newFileDecryptedName = newFileDecryptedName.replace(".txt", "");
+            storePDF(newFileDecryptedName, encryption_directory + "\\" + newFileDecryptedName + ".txt");
+        }
     }
 
     @Override
@@ -224,7 +267,7 @@ public class Functions implements Interface_Proyecto {
         int option;
         do {
             // Solicitar al usuario que ingrese la opción del archivo que desea
-            option = sc.nextInt() - 1;
+            option = numero() - 1;
             try {
                 // Verificar si la opción está fuera de los límites de la matriz de nombres de archivos
                 if (option >= fileNames.length || option < 0) {
@@ -259,8 +302,7 @@ public class Functions implements Interface_Proyecto {
 
     @Override
     public void storePDF(String file, String dir) {
-        String directory = dir + "\\" + file;
-        System.out.println(directory);
+        System.out.println(dir);
         String fileName = file;
 
         String pdfFilePath = pdf_directory + "\\" + fileName + ".pdf"; // donde va a guardar el doc
@@ -273,13 +315,13 @@ public class Functions implements Interface_Proyecto {
 
             PDType1Font font = new PDType1Font(FontName.HELVETICA);
             int fontSize = 12;
-            float margin = 70; // Adjust as needed
+            float margin = 30; // Adjust as needed
             float yPosition = page.getMediaBox().getHeight() - margin;
             float pageWidth = page.getMediaBox().getWidth() - 2 * margin;
             float lineHeight = font.getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * fontSize;
 
             // busca el archivo y lo lee, yo le estoy dando texto directamente, por eso hay error
-            BufferedReader reader = new BufferedReader(new FileReader(directory));
+            BufferedReader reader = new BufferedReader(new FileReader(dir));
             String line;
             while ((line = reader.readLine()) != null) {
                 String wrappedLine = WordUtils.wrap(line, (int) (pageWidth / fontSize), "\n", false);
@@ -337,6 +379,18 @@ public class Functions implements Interface_Proyecto {
         else if (color == "white")
             defaultcolor = ANSI_WHITE;
         return defaultcolor;
+    }
+
+    @Override
+    public int numero() {
+
+        while (!sc.hasNextInt()) {
+            sc.next();
+            System.out.println(Colores("red") + "Not a valid option. Please enter a number." + Colores(null));
+            System.out.print(Colores("white") + "Select an option: " + Colores(null));
+        }
+
+        return sc.nextInt();
     }
 
     @Override
@@ -429,7 +483,7 @@ public class Functions implements Interface_Proyecto {
         File fileRef = new File(path);
         Scanner sc = new Scanner(fileRef);
         if (!sc.hasNextLine()) {
-            throw new Exception("File is empty");
+            return null;
         } else
             return sc;
     }
@@ -439,6 +493,8 @@ public class Functions implements Interface_Proyecto {
         Scanner sc = null;
         try {
             sc = openFile(path);
+            if (sc == null)
+                return null;
         } catch (FileNotFoundException e) {
             System.out.println("Error: " + e.getMessage());
         }
