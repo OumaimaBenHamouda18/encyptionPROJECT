@@ -6,6 +6,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts.FontName;
+import org.w3c.dom.Text;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -29,8 +30,6 @@ public class Functions implements Interface_Proyecto {
     public static final String ANSI_BOLD = "\u001b[1m";
 
     private static final int AES_KEY_SIZE = 128;
-    private static final String ENCRYPTION_ALGORITHM = "AES";
-    private static final String PDF_EXTENSION = ".pdf";
     private static final String TXT_EXTENSION = ".txt";
 
     // Global variables
@@ -38,7 +37,6 @@ public class Functions implements Interface_Proyecto {
     static String encryption_directory = AppConfig.getEncryptionDirectory();
     static String secretKeys_directory = AppConfig.getSecretKeysDirectory();
     static String pdf_directory = AppConfig.getPDFDirectory();
-
 
     // Implementa otros métodos de la interfaz
     //=============================================================================================================\\
@@ -48,10 +46,7 @@ public class Functions implements Interface_Proyecto {
 
     @Override
     public void encrypt_menu() throws Exception {
-        String newFile;
-        String encrypt = "";
-        String file;
-        String textToEncrypt = "";
+        String file, textToEncrypt, newFile, encrypt = "";
 
         Texto("yellow", "║" + ANSI_RESET + "Choose the file to encrypt:" + ANSI_YELLOW + "\n╠═════════════════════════════", true);
 
@@ -60,12 +55,51 @@ public class Functions implements Interface_Proyecto {
             textToEncrypt = getTextFromFile(encryption_directory + "\\" + file, true);
 
             if (textToEncrypt == null)
-                Texto("red", ANSI_YELLOW + "║" + ANSI_BOLD + "Error, empty file, select another.", true);
+                Texto("red", ANSI_YELLOW + "║" + ANSI_BOLD + "❌ Error, empty file, select another.", true);
 
         } while (textToEncrypt == null);
 
-        Texto("yellow", "║ " + ANSI_CYAN + "New file name : ", false);
+        newFile = newNameFile();
 
+        Texto("yellow", "║ " + ANSI_RESET + "Would you like to create and use a secret key?", true);
+        Texto("yellow", "║ 1." + ANSI_RESET + " Yes", true);
+        Texto("yellow", "║ 2." + ANSI_RESET + " No", true);
+        Texto("yellow", "║ Option: ", false);
+
+        int option = OptionFunc();
+        switch (option) {
+            case 1:
+                encrypt = encrypt_with_secret_key(textToEncrypt, newFile);
+                break;
+            case 2:
+                encrypt = encrypt_without_secretkey(textToEncrypt);
+                break;
+            default:
+                Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + "❌ Not a valid option. Try Again.", true);
+                Texto("yellow", "║ Option: ", false);
+        }
+
+        store_in_file(encrypt, decryption_directory + "\\" + newFile);
+        askPDF(newFile, decryption_directory);
+    }
+    @Override
+    public int OptionFunc() {
+        int option;
+        do {
+            option = numero();
+
+            if (option != 1 && option != 2) {
+                Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + "❌ Not a valid option. Try Again.", true);
+                Texto("yellow", "║ Option: ", false);
+            }
+
+        } while (option != 1 && option != 2);
+        return option;
+    }
+    @Override
+    public String newNameFile() {
+        String newFile;
+        Texto("yellow", "║ " + ANSI_CYAN + "New file name : ", false);
         do {
             newFile = sc.next();
             if (!newFile.contains(TXT_EXTENSION)) {
@@ -77,47 +111,7 @@ public class Functions implements Interface_Proyecto {
             }
 
         } while (!checkFile(newFile, true));
-
-        Texto("yellow", "║ " + ANSI_RESET + "Would you like to create and use a secret key?", true);
-        Texto("yellow", "║ 1." + ANSI_RESET + " Yes", true);
-        Texto("yellow", "║ 2." + ANSI_RESET + " No", true);
-        Texto("yellow", "║ Option3: ", false);
-
-        int option;
-        do {
-            option = numero();
-
-            if (option != 1 && option != 2) {
-                Texto("red", ANSI_BOLD + "Not a valid option. Try Again.", true);
-                Texto("yellow", "║ Option3: ", false);
-            }
-
-        } while (option != 1 && option != 2);
-
-        switch (option) {
-            case 1:
-                encrypt = encrypt_with_secret_key(textToEncrypt, newFile);
-                break;
-            case 2:
-                encrypt = encrypt_without_secretkey(textToEncrypt);
-                break;
-            default:
-                Texto("red", ANSI_BOLD + "Not a valid option. Try Again.", true);
-                Texto("yellow", "║ Option:2 ", false);
-        }
-
-        store_in_file(encrypt, decryption_directory + "\\" + newFile);
-
-        Texto("yellow", "║ " + " Would you like to store this in PDF? Y/N", true);
-        Texto("yellow", "║ Option:1 ", false);
-
-        String respuesta = sc.next();
-        sc.nextLine();
-
-        if (respuesta.equalsIgnoreCase("Y")) {
-            newFile = newFile.replace(TXT_EXTENSION, "");
-            storePDF(newFile, decryption_directory + "\\" + newFile + TXT_EXTENSION);
-        }
+        return newFile;
     }
 
     @Override
@@ -141,81 +135,74 @@ public class Functions implements Interface_Proyecto {
 
     @Override
     public void decrypt_menu() throws Exception {
-        String decryptado = "";
-        String fileName = "";
-        String decrptedtextfromfile = "";
-        String newFileDecryptedName = "";
+        String fileName, decrptedtextfromfile, newFileDecryptedName, decryptado = "";
+
         Texto("yellow", "║" + ANSI_RESET + "Choose the file to decrypt :" + ANSI_YELLOW + "\n╠═════════════════════════════", true);
         do {
             fileName = choose_file_from_dir(decryption_directory, "decrypt");
             decrptedtextfromfile = getTextFromFile(decryption_directory + "\\" + fileName, false);
             if (decrptedtextfromfile == null)
-                Texto("red", ANSI_YELLOW + "║" + ANSI_BOLD + "Error, empty file, select another.", true);
+                Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + " ❌ Error, empty file, select another.", true);
         } while (decrptedtextfromfile == null);
         //leer and store the text to decrypt
 
         Texto("yellow", "║ " + ANSI_RESET + "Do you have a secret key?", true);
+        Texto("yellow", "╠═════════════════════════════", true);
         Texto("yellow", "║ 1." + ANSI_RESET + " Yes", true);
         Texto("yellow", "║ 2." + ANSI_RESET + " No", true);
-        Texto("yellow", "║ Option5: ", false);
-        int option;
-        do {
-            option = numero();
+        Texto("yellow", "║ Option: ", false);
 
-            if (option != 1 && option != 2) {
-                Texto("yellow", ANSI_YELLOW + "║ " + ANSI_BOLD + ANSI_RED + "Not a valid option. Try Again.", true);
-                Texto("yellow", "║ Option: ", false);
-            }
-        } while (option != 1 && option != 2);
+        int option = OptionFunc();
 
-        switch (option) {
-            case 1:
-                decryptado = decrypt_with_secret_key(decrptedtextfromfile);
-                break;
-            case 2:
-                decryptado = decrypt_without_secret_key(decrptedtextfromfile);
-                break;
-        }
+        decryptado = switch (option) {
+            case 1 -> decrypt_with_secret_key(decrptedtextfromfile, fileName);
+            case 2 -> decrypt_without_secret_key(decrptedtextfromfile);
+            default -> decryptado;
+        };
 
-        Texto("yellow", "║ "+ANSI_RESET+"Type the name you want to store the decrypted file with : ", false);
+        // revisar aqui y que rompa el hilo y que no se ejecute mas de una vez
 
-        do {
-            // Scanner , para el nombre del nuevo archivo, si este no tiene el .txt, se le agrega.
-            newFileDecryptedName = sc.next();
-            if (!newFileDecryptedName.contains(".txt")) {
-                newFileDecryptedName = newFileDecryptedName + ".txt";
-            }
 
-            // si ya existe un archivo con ese nombre vuelve al loop del while.
-            if (!checkFile(newFileDecryptedName, true)) {
-                Texto("yellow", "║ " + ANSI_RESET + "This file name already exists please type another filename: ", false);
-            }
-        } while (!checkFile(newFileDecryptedName, true));
+        newFileDecryptedName = newNameFile();
         //store decrypted text with the name specified
         store_in_file(decryptado, encryption_directory + "\\" + newFileDecryptedName);
+        askPDF(newFileDecryptedName, encryption_directory);
+    }
+
+    @Override
+    public void askPDF(String pdfName, String dir) {
         Texto("yellow", "║ "+ANSI_RESET + "Would you like to store this in PDF? Y/N", true);
         Texto("yellow", "║ Answer : ", false);
         String respuesta = sc.next();
         sc.nextLine();
         if (respuesta.equalsIgnoreCase("Y")) {
-            newFileDecryptedName = newFileDecryptedName.replace(".txt", "");
-            storePDF(newFileDecryptedName, encryption_directory + "\\" + newFileDecryptedName + ".txt");
+            if(pdfName.contains(".txt"))
+                pdfName = pdfName.replace(".txt", "");
+            storePDF(pdfName, dir + "\\" + pdfName + ".txt");
         }
     }
 
     @Override
     public String decrypt_without_secret_key(String encryptedText) throws Exception {
-        return Unsafe_decrypt(encryptedText);
+        try {
+            return Unsafe_decrypt(encryptedText);
+        } catch (Exception e) {
+            Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + "Error, this file needs a key", true);
+            decrypt_menu(); // Asegúrate de que decrypt_menu() devuelva un valor o establece un valor por defecto.
+            // Puedes asignar un valor por defecto o lanzar una excepción, según tus necesidades.
+            return ""; // O devuelve un valor predeterminado en caso de error.
+        }
     }
 
-    @Override
-    public String decrypt_with_secret_key(String encryptedText) throws Exception {
-        String secretKeyFileName = "";
 
+
+    @Override
+    public String decrypt_with_secret_key(String encryptedText, String FileNameKey) throws Exception {
+        String secretKeyFileName;
         // Leer y almacenar la clave secreta base64 que se utilizará para descifrar
         Texto("yellow", "║ "+ANSI_RESET+"Choose the file you want to retrieve the secret key from : ", true);
         Texto("yellow", "╠═════════════════════════════", true);
-        secretKeyFileName = choose_file_from_dir(secretKeys_directory, "retrieve the secret key from");
+        secretKeyFileName = choose_file_from_dir(secretKeys_directory, FileNameKey);
 
         String keyString = getTextFromFile(secretKeys_directory + "\\" + secretKeyFileName, false);
 
@@ -225,8 +212,8 @@ public class Functions implements Interface_Proyecto {
         try {
             decryptado = decrypt(encryptedText, secKey);
         } catch (Exception e) {
-            Texto("yellow", "║ "+ANSI_BOLD+ ANSI_RED+"Secret key doesn't correspond to the file you want to decrypt!", true);
-            decrypt_with_secret_key(encryptedText);
+            Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + " ❌ Secret key doesn't correspond to the file you want to decrypt!", true);
+            decrypt_with_secret_key(encryptedText, null);
         }
         return decryptado;
 
@@ -258,7 +245,7 @@ public class Functions implements Interface_Proyecto {
     @Override
     public String choose_file_from_dir(String dirPath, String fileType) {
         File folderRef = new File(dirPath);
-        String[] fileNames = null;
+        String[] fileNames;
         String file = "";
 
         // Verificar si el directorio existe y es un directorio válido
@@ -267,35 +254,43 @@ public class Functions implements Interface_Proyecto {
             fileNames = folderRef.list();
 
             // Si no hay archivos en el directorio, mostrar un mensaje
-            if (fileNames.length == 0)
-                System.out.println(ANSI_RED + "There's no files here. \nEmpty directory." + ANSI_RESET);
+            if (fileNames != null && fileNames.length == 0)
+                Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + "There's no files here. Empty directory.", true);
 
             // Si hay archivos en el directorio
             if (fileNames != null && fileNames.length > 0) {
                 // Mostrar los archivos en el directorio
-                show_files(folderRef);
+
+                    show_files(folderRef, fileType);
+
                 // Permitir al usuario elegir un archivo con un escáner, basado en el tipo de archivo
                 file = user_choose_file_with_scanner(fileNames, fileType);
             } else {
-                System.out.println(ANSI_RED + "There's no files in this directory" + ANSI_RESET);
+                Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + "There's no files in this directory.", true);
             }
         } else {
-            System.out.println(ANSI_RED + "This directory doesn't exist" + ANSI_RESET);
+            Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + "This directory doesn't exist", true);
         }
 
         return file;
     }
 
     @Override
-    public void show_files(File folderRef) {
-
+    public void show_files(File folderRef, String KeyFile) {
         int i = 1;
         String[] fileNames = folderRef.list();
-        for (String file : fileNames) {
-            System.out.println(Colores("yellow") + "║ " + Colores(null) + i + ". " + file);
-            i++;
+        if (fileNames != null) {
+            for (String file : fileNames) {
+                        if (file.contains("key_"+KeyFile)) {
+                            Texto("yellow", "║ " + ANSI_GREEN + i + ". " + file + " - Suggested file", true);
+                    } else {
+                        Texto("yellow", "║ " + ANSI_RESET + i + ". " + file, true);
+                    }
+
+                i++;
+            }
         }
-        System.out.print(Colores("yellow") + "║ File : " + Colores(null));
+        Texto("yellow", "║ File : ", false);
     }
 
     @Override
@@ -307,10 +302,10 @@ public class Functions implements Interface_Proyecto {
             try {
                 // Verificar si la opción está fuera de los límites de la matriz de nombres de archivos
                 if (option >= fileNames.length || option < 0) {
-                    System.out.println(Colores("red") + "Not a valid option. Please enter a number." + Colores(null));
-                    System.out.print("Select an option: ");
+                    Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + "❌ Not a valid option. Please enter a number", true);
+                    Texto("yellow", "║ Option : ", false);
                 }
-            } catch (IndexOutOfBoundsException e) {
+            } catch (IndexOutOfBoundsException ignored) {
             }
         } while (option >= fileNames.length || option < 0);
 
@@ -319,28 +314,9 @@ public class Functions implements Interface_Proyecto {
     }
 
     @Override
-    public void menu_PDF() {
-        String fileName = "";
-        String dir = "";
-        System.out.println(ANSI_CYAN + "Select the folder where you want to extract de file:\n1-Encrypted files\n2-Decrypted Files" + ANSI_RESET);
-        switch (sc.nextInt()) {
-            case 1:
-                fileName = choose_file_from_dir(decryption_directory, "decrypted_files");
-                dir = decryption_directory;
-                break;
-            case 2:
-                fileName = choose_file_from_dir(encryption_directory, "encrypted_files");
-                dir = encryption_directory;
-                break;
-        }
-        storePDF(fileName, dir);
-    }
-
-    @Override
     public void storePDF(String file, String dir) {
-        String fileName = file;
 
-        String pdfFilePath = pdf_directory + "\\" + fileName + ".pdf"; // donde va a guardar el doc
+        String pdfFilePath = pdf_directory + "\\" + file + ".pdf"; // donde va a guardar el doc
         try {
             PDDocument document = new PDDocument();
             PDPage page = new PDPage();
@@ -385,7 +361,7 @@ public class Functions implements Interface_Proyecto {
             document.close();
 
 
-            System.out.println(ANSI_GREEN + "Conversion complete. PDF file saved to: " + pdfFilePath + ANSI_RESET);
+            Texto("yellow", "║ " + ANSI_BOLD + ANSI_GREEN + "✅ Conversion complete. PDF file saved in " + pdfFilePath, true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -395,51 +371,27 @@ public class Functions implements Interface_Proyecto {
     //                                                AES                                                          \\
     //=============================================================================================================\\
 
-    @Override
-    public String Colores(String color) {
-        String defaultcolor = ANSI_RESET; //reset
-        if (color == "black")
-            defaultcolor = ANSI_BLACK;
-        else if (color == "red")
-            defaultcolor = ANSI_RED;
-        else if (color == "green")
-            defaultcolor = ANSI_GREEN;
-        else if (color == "yellow")
-            defaultcolor = ANSI_YELLOW;
-        else if (color == "blue")
-            defaultcolor = ANSI_BLUE;
-        else if (color == "purple")
-            defaultcolor = ANSI_PURPLE;
-        else if (color == "cyan")
-            defaultcolor = ANSI_CYAN;
-        else if (color == "white")
-            defaultcolor = ANSI_WHITE;
-        return defaultcolor;
-    }
 
     @Override
-    public void Texto(String color, String Texto, boolean saltoLinea) {
-        String defaultcolor = ANSI_RESET; //reset
-        if (color == "black")
-            defaultcolor = ANSI_BLACK;
-        else if (color == "red")
-            defaultcolor = ANSI_RED;
-        else if (color == "green")
-            defaultcolor = ANSI_GREEN;
-        else if (color == "yellow")
-            defaultcolor = ANSI_YELLOW;
-        else if (color == "blue")
-            defaultcolor = ANSI_BLUE;
-        else if (color == "purple")
-            defaultcolor = ANSI_PURPLE;
-        else if (color == "cyan")
-            defaultcolor = ANSI_CYAN;
-        else if (color == "white")
-            defaultcolor = ANSI_WHITE;
+    public void Texto(String color, String texto, boolean saltoLinea) {
+        String defaultColor = ANSI_RESET; // reset
+
+        switch (color) {
+            case "black" -> defaultColor = ANSI_BLACK;
+            case "red" -> defaultColor = ANSI_RED;
+            case "green" -> defaultColor = ANSI_GREEN;
+            case "yellow" -> defaultColor = ANSI_YELLOW;
+            case "blue" -> defaultColor = ANSI_BLUE;
+            case "purple" -> defaultColor = ANSI_PURPLE;
+            case "cyan" -> defaultColor = ANSI_CYAN;
+            case "white" -> defaultColor = ANSI_WHITE;
+            case "bold" -> defaultColor = ANSI_BOLD;
+        }
+
         if (saltoLinea) {
-            System.out.println(defaultcolor + Texto + ANSI_RESET);
+            System.out.println(defaultColor + texto + ANSI_RESET);
         } else {
-            System.out.print(defaultcolor + Texto + ANSI_RESET);
+            System.out.print(defaultColor + texto + ANSI_RESET);
         }
     }
 
@@ -447,8 +399,8 @@ public class Functions implements Interface_Proyecto {
     public int numero() {
         while (!sc.hasNextInt()) {
             sc.next();
-            System.out.println(Colores("red") + "Not a valid option. Please enter a number." + Colores(null));
-            System.out.print(Colores("white") + "Select an option: " + Colores(null));
+            Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + "❌ Not a valid option. Please enter a number", true);
+            Texto("yellow", "║ Option : ", false);
         }
         return sc.nextInt();
     }
@@ -465,8 +417,7 @@ public class Functions implements Interface_Proyecto {
         generator.init(AES_KEY_SIZE);
 
         //This method generates a new secret key based on the initialization parameters set with init().
-        SecretKey secretKey = generator.generateKey();
-        return secretKey;
+        return generator.generateKey();
     }
 
     @Override
@@ -556,7 +507,7 @@ public class Functions implements Interface_Proyecto {
             if (sc == null)
                 return null;
         } catch (FileNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + "❌ Error: " + e.getMessage(), true);
         }
         StringBuilder textToEncrypt = new StringBuilder();
         if (encriptar) {
@@ -576,7 +527,7 @@ public class Functions implements Interface_Proyecto {
         BufferedWriter bw = new BufferedWriter(new FileWriter(path));
         bw.write(textToStore);
         bw.close();
-        System.out.println(Colores("yellow") + "║ " + Colores("green") + "Succes, saving in " + path + Colores(null));
+        Texto("yellow", "║ " + ANSI_BOLD + ANSI_GREEN + "✅ Succes, saving in " + path, true);
     }
 
 
@@ -596,29 +547,34 @@ public class Functions implements Interface_Proyecto {
 
     @Override
     public String Unsafe_encrypt(String textToEncrypt) {
-        String encryptedText = "";
+        StringBuilder encryptedText = new StringBuilder();
         for (int i = 0; i < textToEncrypt.length(); i++) {
-            encryptedText += (int) (textToEncrypt.charAt(i)) + "|";
+            encryptedText.append((int) (textToEncrypt.charAt(i))).append("|");
         }
-        return encryptedText;
+        return encryptedText.toString();
     }
 
 
     @Override
     public String Unsafe_decrypt(String encryptedText) {
-        String decryptedText = "";
+
+
+        ///////////////////// try aqui para arreglar error
+
+
+        StringBuilder decryptedText = new StringBuilder();
         int ascciiValue;
         for (int i = 0; i < encryptedText.length(); i++) {
             for (int j = i; j <= encryptedText.length(); j++) {
                 if (encryptedText.charAt(j) == '|') {
                     ascciiValue = Integer.parseInt(encryptedText.substring(i, j));
-                    decryptedText += (char) ascciiValue;
+                    decryptedText.append((char) ascciiValue);
                     j++;
                     i = j;
                 }
             }
         }
-        return decryptedText;
+        return decryptedText.toString();
     }
 }
 

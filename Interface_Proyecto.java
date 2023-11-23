@@ -32,18 +32,28 @@ public interface Interface_Proyecto{
     //=============================================================================================================\\
 
     void encrypt_menu() throws Exception;
+
+
+    int OptionFunc();
+
+    String newNameFile();
+
     String encrypt_without_secretkey(String encrypetText);
     String encrypt_with_secret_key(String encryptedText, String newFile) throws Exception;
     void decrypt_menu() throws Exception;
+    void askPDF(String pdfName, String dir);
+
     String decrypt_without_secret_key(String encryptedText) throws Exception;
-    String decrypt_with_secret_key(String encryptedText) throws Exception;
+
+    String decrypt_with_secret_key(String encryptedText, String FileNameKey) throws Exception;
+
     boolean checkFile(String file, boolean encriptar);
     String choose_file_from_dir(String dirPath, String fileType);
-    void show_files(File folderRef);
+
+    void show_files(File folderRef, String KeyFile);
+
     String user_choose_file_with_scanner(String[] fileNames, String fileType);
-    void menu_PDF();
     void storePDF(String file, String dir);
-    String Colores(String color);
     void Texto(String color, String Texto, boolean saltoLinea);
     int numero();
 
