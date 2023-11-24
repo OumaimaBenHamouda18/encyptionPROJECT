@@ -36,7 +36,7 @@ public interface Interface_Proyecto{
 
     int OptionFunc();
 
-    String newNameFile();
+    String newNameFile(String dir);
 
     String encrypt_without_secretkey(String encrypetText);
     String encrypt_with_secret_key(String encryptedText, String newFile) throws Exception;
@@ -47,7 +47,7 @@ public interface Interface_Proyecto{
 
     String decrypt_with_secret_key(String encryptedText, String FileNameKey) throws Exception;
 
-    boolean checkFile(String file, boolean encriptar);
+    boolean checkFile(String file, String dire);
     String choose_file_from_dir(String dirPath, String fileType);
 
     void show_files(File folderRef, String KeyFile);

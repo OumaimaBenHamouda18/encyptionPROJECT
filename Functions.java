@@ -59,7 +59,7 @@ public class Functions implements Interface_Proyecto {
 
         } while (textToEncrypt == null);
 
-        newFile = newNameFile();
+        newFile = newNameFile(decryption_directory);
 
         Texto("yellow", "║ " + ANSI_RESET + "Would you like to create and use a secret key?", true);
         Texto("yellow", "║ 1." + ANSI_RESET + " Yes", true);
@@ -97,20 +97,23 @@ public class Functions implements Interface_Proyecto {
         return option;
     }
     @Override
-    public String newNameFile() {
+    public String newNameFile(String dir) {
         String newFile;
+        String extension = TXT_EXTENSION;
+        if (dir == pdf_directory)
+            extension = ".pdf";
         Texto("yellow", "║ " + ANSI_CYAN + "New file name : ", false);
         do {
             newFile = sc.next();
-            if (!newFile.contains(TXT_EXTENSION)) {
-                newFile = newFile + TXT_EXTENSION;
+            if (!newFile.contains(extension)) {
+                newFile = newFile + extension;
             }
 
-            if (!checkFile(newFile, true)) {
+            if (!checkFile(newFile, dir)) {
                 Texto("yellow", "║ " + ANSI_RESET + "This file name already exists. Please type another filename: ", false);
             }
 
-        } while (!checkFile(newFile, true));
+        } while (!checkFile(newFile, dir));
         return newFile;
     }
 
@@ -164,9 +167,7 @@ public class Functions implements Interface_Proyecto {
             return;
         }
 
-        // revisar aqui y que rompa el hilo y que no se ejecute mas de una vez
-
-        newFileDecryptedName = newNameFile();
+        newFileDecryptedName = newNameFile(encryption_directory);
         //store decrypted text with the name specified
         store_in_file(decryptado, encryption_directory + "\\" + newFileDecryptedName);
         askPDF(newFileDecryptedName, encryption_directory);
@@ -222,15 +223,11 @@ public class Functions implements Interface_Proyecto {
     }
 
     @Override
-    public boolean checkFile(String file, boolean encriptar) {
+    public boolean checkFile(String file, String dire) {
         // Revisa si ya existe un archivo con el mismo nombre en el mismo directorio, en el caso de que si devuelve un true, la booleana
         // sirve para que se pueda usar en ambos directorios.
-        String path = encryption_directory;
-        if (encriptar) {
-            path = decryption_directory;
-        }
 
-        File dir = new File(path);
+        File dir = new File(dire);
         if (dir.exists() && dir.isDirectory()) {
             String[] fileNames = dir.list();
             if (fileNames != null) {
@@ -317,8 +314,9 @@ public class Functions implements Interface_Proyecto {
 
     @Override
     public void storePDF(String file, String dir) {
+        String FileName = newNameFile(pdf_directory);
+        String pdfFilePath = pdf_directory + "\\" + FileName; // donde va a guardar el doc
 
-        String pdfFilePath = pdf_directory + "\\" + file + ".pdf"; // donde va a guardar el doc
         try {
             PDDocument document = new PDDocument();
             PDPage page = new PDPage();
