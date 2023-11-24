@@ -21,11 +21,11 @@ public class menu {
             int opcion = F.numero();
             switch (opcion) {
                 case 1:
-
                     F.encrypt_menu(); // Llama al método encrypt_menu
                     break;
                 case 2:
                     F.decrypt_menu(); // Llama al método decrypt_menu
+
                     break;
                 case 3:
                     F.Texto("yellow", "║ ", false);

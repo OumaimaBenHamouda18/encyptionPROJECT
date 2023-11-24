@@ -157,17 +157,21 @@ public class Functions implements Interface_Proyecto {
         decryptado = switch (option) {
             case 1 -> decrypt_with_secret_key(decrptedtextfromfile, fileName);
             case 2 -> decrypt_without_secret_key(decrptedtextfromfile);
-            default -> decryptado;
+            default -> throw new IllegalStateException("Unexpected value: " + option);
         };
+        if (decryptado == null) {
+            decrypt_menu();
+            return;
+        }
 
         // revisar aqui y que rompa el hilo y que no se ejecute mas de una vez
-
 
         newFileDecryptedName = newNameFile();
         //store decrypted text with the name specified
         store_in_file(decryptado, encryption_directory + "\\" + newFileDecryptedName);
         askPDF(newFileDecryptedName, encryption_directory);
     }
+
 
     @Override
     public void askPDF(String pdfName, String dir) {
@@ -188,9 +192,7 @@ public class Functions implements Interface_Proyecto {
             return Unsafe_decrypt(encryptedText);
         } catch (Exception e) {
             Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + "Error, this file needs a key", true);
-            decrypt_menu(); // Asegúrate de que decrypt_menu() devuelva un valor o establece un valor por defecto.
-            // Puedes asignar un valor por defecto o lanzar una excepción, según tus necesidades.
-            return ""; // O devuelve un valor predeterminado en caso de error.
+            return null; // O devuelve un valor predeterminado en caso de error.
         }
     }
 
