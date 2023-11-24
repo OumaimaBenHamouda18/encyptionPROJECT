@@ -6,7 +6,6 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts.FontName;
-import org.w3c.dom.Text;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -52,6 +51,8 @@ public class Functions implements Interface_Proyecto {
 
         do {
             file = choose_file_from_dir(encryption_directory, "encrypt");
+            if (file == null) return;
+
             textToEncrypt = getTextFromFile(encryption_directory + "\\" + file, true);
 
             if (textToEncrypt == null)
@@ -143,6 +144,7 @@ public class Functions implements Interface_Proyecto {
         Texto("yellow", "║" + ANSI_RESET + "Choose the file to decrypt :" + ANSI_YELLOW + "\n╠═════════════════════════════", true);
         do {
             fileName = choose_file_from_dir(decryption_directory, "decrypt");
+            if (fileName == null) return;
             decrptedtextfromfile = getTextFromFile(decryption_directory + "\\" + fileName, false);
             if (decrptedtextfromfile == null)
                 Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + " ❌ Error, empty file, select another.", true);
@@ -206,6 +208,7 @@ public class Functions implements Interface_Proyecto {
         Texto("yellow", "║ "+ANSI_RESET+"Choose the file you want to retrieve the secret key from : ", true);
         Texto("yellow", "╠═════════════════════════════", true);
         secretKeyFileName = choose_file_from_dir(secretKeys_directory, FileNameKey);
+        if (secretKeyFileName == null) return null;
 
         String keyString = getTextFromFile(secretKeys_directory + "\\" + secretKeyFileName, false);
 
@@ -260,7 +263,7 @@ public class Functions implements Interface_Proyecto {
             if (fileNames != null && fileNames.length > 0) {
                 // Mostrar los archivos en el directorio
 
-                    show_files(folderRef, fileType);
+                show_files(folderRef, fileType);
 
                 // Permitir al usuario elegir un archivo con un escáner, basado en el tipo de archivo
                 file = user_choose_file_with_scanner(fileNames, fileType);
@@ -280,14 +283,17 @@ public class Functions implements Interface_Proyecto {
         String[] fileNames = folderRef.list();
         if (fileNames != null) {
             for (String file : fileNames) {
-                        if (file.contains("key_"+KeyFile)) {
-                            Texto("yellow", "║ " + ANSI_GREEN + i + ". " + file + " - Suggested file", true);
-                    } else {
-                        Texto("yellow", "║ " + ANSI_RESET + i + ". " + file, true);
-                    }
+                if (file.contains("key_" + KeyFile)) {
+                    Texto("yellow", "║ " + ANSI_GREEN + i + ". " + file + " - Suggested file", true);
+                } else {
+                    Texto("yellow", "║ " + ANSI_RESET + i + ". " + file, true);
+                }
 
                 i++;
             }
+            Texto("yellow", "║ " + ANSI_RESET + ANSI_BOLD + (i) + ". Return to menu", true);
+
+
         }
         Texto("yellow", "║ File : ", false);
     }
@@ -298,7 +304,9 @@ public class Functions implements Interface_Proyecto {
         do {
             // Solicitar al usuario que ingrese la opción del archivo que desea
             option = numero() - 1;
+            if (option + 1 == fileNames.length + 1) return null;
             try {
+
                 // Verificar si la opción está fuera de los límites de la matriz de nombres de archivos
                 if (option >= fileNames.length || option < 0) {
                     Texto("yellow", "║ " + ANSI_BOLD + ANSI_RED + "❌ Not a valid option. Please enter a number", true);
@@ -557,10 +565,6 @@ public class Functions implements Interface_Proyecto {
 
     @Override
     public String Unsafe_decrypt(String encryptedText) {
-
-
-        ///////////////////// try aqui para arreglar error
-
 
         StringBuilder decryptedText = new StringBuilder();
         int ascciiValue;
